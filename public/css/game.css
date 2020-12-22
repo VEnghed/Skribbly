@@ -1,0 +1,11 @@
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+.controls {
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
