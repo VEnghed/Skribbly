@@ -24,11 +24,11 @@ function draw() {
 			prevX = x;
 			prevY = y;
 			ellipse(x, y, 15, 15);
-			send(x, y);
+			sendStroke(x, y);
 		}
 }
 
-function send(x, y) {
+function sendStroke(x, y) {
 	socket.emit("message", { x: x, y: y });
 	console.log("sending");
 }
