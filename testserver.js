@@ -40,34 +40,41 @@ app.post("/login", (req, res) => {
 
 let server = app.listen(1337, () => console.log("listening..."));
 
-var ws = io(server);
+var ws = io(server)
 
 //my own middleware to expose the request, lets us access session data in ws
 ws.use((socket, next) => {
-	sessionMiddleware(socket.request, {}, next);
+	sessionMiddleware(socket.request, {}, next)
 });
 
 ws.on("connection", (socket) => {
-	let name = socket.request.session.name;
-	let room = socket.request.session.room;
+	let name = socket.request.session.name
+	let room = socket.request.session.room
 
-	socket.join(room);
+	console.log(name + ' connected')
+
+	socket.join(room)
 
 	if (!rooms[room]) {
-		console.log("Created room " + room);
-		rooms[room] = { players: {} };
+		console.log("Created room " + room)
+		rooms[room] = { players: {} }
 	}
-	rooms[room].players[name] = { points: 0 };
+	rooms[room].players[name] = { points: 0 }
 
-	console.log(rooms);
+	console.log(rooms)
 
+	// When a player draws, others in the room gets notified.
 	socket.on("message", (data) => {
 		socket.to(room).emit("stroke", data);
-	});
+	})
 
+	// When a player disconnects.
 	socket.on("disconnect", () => {
-		console.log("bye, " + name);
+		console.log(name + ' has disconnected')
 		delete rooms[room].players[name];
-		console.log(rooms);
-	});
-});
+		console.log('\t', rooms);
+	})
+
+	// When someone connects, we tell all in the room.
+	ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+})
