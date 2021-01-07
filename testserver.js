@@ -61,8 +61,12 @@ ws.on("connection", (socket) => {
 
 	console.log(rooms);
 
-	socket.on("message", (data) => {
+	socket.on("sketch", (data) => {
 		socket.to(room).emit("stroke", data);
+	});
+
+	socket.on("sendmsg", (msg) => {
+		socket.to(room).emit("recvmsg", msg);
 	});
 
 	socket.on("disconnect", () => {
@@ -71,6 +75,7 @@ ws.on("connection", (socket) => {
 
 		// if no players are present in the room -> delete room
 		if (ObjectLength(rooms[room].players) === 0) {
+			console.log("Deleting " + rooms[room] + "...");
 			delete rooms[room];
 		}
 		console.log(rooms);

@@ -29,6 +29,6 @@ function draw() {
 }
 
 function sendStroke(x, y) {
-	socket.emit("message", { x: x, y: y });
-	console.log("sending");
+	socket.emit("sketch", { x: x, y: y });
+	console.log("sending sketch");
 }
