@@ -63,18 +63,40 @@ ws.on("connection", (socket) => {
 
 	console.log(rooms)
 
-	// When a player draws, others in the room gets notified.
-	socket.on("message", (data) => {
+	socket.on("sketch", (data) => {
 		socket.to(room).emit("stroke", data);
 	})
+
+	socket.on("sendmsg", (msg) => {
+		socket.to(room).emit("recvmsg", msg);
+	});
 
 	// When a player disconnects.
 	socket.on("disconnect", () => {
 		console.log(name + ' has disconnected')
 		delete rooms[room].players[name];
+		
+		ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+		// if no players are present in the room -> delete room
+		if (ObjectLength(rooms[room].players) === 0) {
+			console.log("Deleting " + rooms[room] + "...");
+			delete rooms[room];
+		}
 		console.log('\t', rooms);
 	})
 
 	// When someone connects, we tell all in the room.
 	ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
-})
+
+	console.log(rooms);
+});
+
+function ObjectLength(object) {
+	var length = 0;
+	for (var key in object) {
+		if (object.hasOwnProperty(key)) {
+			++length;
+		}
+	}
+	return length;
+}

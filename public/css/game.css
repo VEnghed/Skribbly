@@ -1,11 +1,15 @@
 body {
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 }
 
 .controls {
-    margin-right: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
+	margin-right: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+#chat-wrapper {
+	display: flex;
 }

@@ -19,20 +19,21 @@ function setup() {
 }
 
 function draw() {
-  let x = Math.floor(mouseX)
-  let y = Math.floor(mouseY)
+	let x = Math.floor(mouseX);
+	let y = Math.floor(mouseY);
 
-  if (mouseIsPressed && x >= 0 && y >= 0 && x <= 600 && y <= 400)
-    if (prevX != x || prevY != y) {
-      prevX = x
-      prevY = y
-      ellipse(x, y, 15, 15)
-      send(x, y)
-    }
+	if (mouseIsPressed && x >= 0 && y >= 0 && x <= 600 && y <= 400)
+		if (prevX != x || prevY != y) {
+			prevX = x;
+			prevY = y;
+			ellipse(x, y, 15, 15);
+			sendStroke(x, y);
+		}
 }
 
-function send(x, y) {
-  socket.emit('message', { x: x, y: y })
+function sendStroke(x, y) {
+	socket.emit("sketch", { x: x, y: y });
+	console.log("sending sketch");
 }
 
 function updatePlayers(data) {
