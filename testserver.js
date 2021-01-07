@@ -68,6 +68,21 @@ ws.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		console.log("bye, " + name);
 		delete rooms[room].players[name];
+
+		// if no players are present in the room -> delete room
+		if (ObjectLength(rooms[room].players) === 0) {
+			delete rooms[room];
+		}
 		console.log(rooms);
 	});
 });
+
+function ObjectLength(object) {
+	var length = 0;
+	for (var key in object) {
+		if (object.hasOwnProperty(key)) {
+			++length;
+		}
+	}
+	return length;
+}
