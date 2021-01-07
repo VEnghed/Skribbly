@@ -1,18 +1,6 @@
-var socket;
-var inputField;
 
-function setup() {
-	socket = io.connect("http://localhost:1337");
-
-	inputField = createInput("");
-	inputField.id("chat-inputfield");
-	inputField.parent("chat-wrapper");
-
+function setupChat() {
 	//inputField.input(inputEvent);
-
-	socket.on("recvmsg", (msg) => {
-		console.log("someone sent: " + msg.msg);
-	});
 }
 
 function keyPressed() {

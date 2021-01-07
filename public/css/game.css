@@ -12,4 +12,19 @@ body {
 
 #chat-wrapper {
 	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background-color: beige;
+
+}
+
+.chatSender {
+	display: flex;
+	flex-direction: row;
+	height: 30px;
+}
+
+.chat {
+	overflow-y: scroll;
+	overflow-x: hidden;
 }

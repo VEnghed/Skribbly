@@ -48,6 +48,9 @@ ws.use((socket, next) => {
 });
 
 ws.on("connection", (socket) => {
+
+	if (socket.request.session.name == '') return;
+
 	let name = socket.request.session.name
 	let room = socket.request.session.room
 
@@ -68,20 +71,20 @@ ws.on("connection", (socket) => {
 	})
 
 	socket.on("sendmsg", (msg) => {
-		socket.to(room).emit("recvmsg", msg);
+		ws.in(room).emit("recvmsg", {sender : name, msg : msg.msg});
 	});
 
 	// When a player disconnects.
 	socket.on("disconnect", () => {
 		console.log(name + ' has disconnected')
 		delete rooms[room].players[name];
-		
+
 		ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
 		// if no players are present in the room -> delete room
-		if (ObjectLength(rooms[room].players) === 0) {
-			console.log("Deleting " + rooms[room] + "...");
-			delete rooms[room];
-		}
+		/* 		if (ObjectLength(rooms[room].players) === 0) {
+					console.log("Deleting " + rooms[room] + "...");
+					delete rooms[room];
+				} */
 		console.log('\t', rooms);
 	})
 
