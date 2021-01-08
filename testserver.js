@@ -48,11 +48,6 @@ ws.use((socket, next) => {
 });
 
 ws.on("connection", (socket) => {
-	if (socket.request.session.name === "") {
-		console.log("EMPTY SESSION NAME FOUND");
-		return;
-	}
-
 	let name = socket.request.session.name;
 	let room = socket.request.session.room;
 
