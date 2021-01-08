@@ -1,7 +1,8 @@
 var prevX = -1;
 var prevY = -1;
-var inputField;
-var chatButton;
+var chatSendField;
+var chatSendButton;
+var chatBox;
 
 function setup() {
 	let canvas = createCanvas(600, 400);
@@ -9,12 +10,17 @@ function setup() {
 	background(0);
 	noStroke();
 
-	inputField = document.getElementById("sendField");
-	chatButton = document.getElementById("sendButton");
-	chatWindow = document.getElementById("chat");
-	chatButton.onclick = () => {
-		sendMessage(inputField.value);
-		inputField.value = "";
+	chatSendField = document.getElementById("chatSendField");
+	chatSendButton = document.getElementById("chatSendButton");
+  chatBox = document.getElementById("chat-box");
+
+  chatBox.addEventListener("DOMSubtreeModified", () => {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+  
+	chatSendButton.onclick = () => {
+		sendMessage(chatSendField.value);
+		chatSendField.value = "";
 	};
 
 	socket.on("stroke", (data) => {
@@ -25,7 +31,7 @@ function setup() {
 
 	socket.on("recvmsg", (msg) => {
 		console.log(msg.sender + ": " + msg.msg);
-		chatWindow.innerHTML += "<p>" + msg.sender + ": " + msg.msg + "</p>";
+		chatBox.innerHTML += "<p><b>" + msg.sender + ":</b> " + msg.msg + "</p>";
 	});
 }
 
@@ -47,18 +53,18 @@ function sendStroke(x, y) {
 }
 
 function updatePlayers(data) {
-	let leftColumn = document.getElementById("left");
-	leftColumn.innerHTML = "Online:";
+	let userListColumn = document.getElementById("userlist");
+	userListColumn.innerHTML = "<p>Users in room:</p>";
 	data.forEach((element) => {
-		leftColumn.innerHTML += "<p>" + element + "</p>";
+		userListColumn.innerHTML += "<p>" + element + "</p>";
 	});
 }
 
 // Key listener
 function keyPressed() {
 	if (keyCode === ENTER) {
-		sendMessage(inputField.value);
-		inputField.value = "";
+		sendMessage(chatSendField.value);
+		chatSendField.value = "";
 	}
 }
 
@@ -66,3 +72,4 @@ function sendMessage(msg) {
 	socket.emit("sendmsg", { msg: msg });
 	console.log("sending message: " + msg);
 }
+

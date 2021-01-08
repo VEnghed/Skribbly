@@ -1,0 +1,30 @@
+body {
+	display: flex;
+	flex-direction: row;
+}
+
+.controls {
+	margin-right: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+#chat-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background-color: beige;
+
+}
+
+.chatSender {
+	display: inline-block;
+	flex-direction: row;
+	height: 30px;
+}
+
+.chat {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}

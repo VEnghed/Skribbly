@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Sketch</title>
+		<script src="https://unpkg.com/socket.io-client@3.0.1/dist/socket.io.min.js"></script>
+		<script>
+			socket = io.connect();
+		</script>
+		<script src="js/lib/p5.min.js"></script>
+		<script src="js/lib/addons/p5.dom.min.js"></script>
+		<script src="js/sketch.js"></script>
+		<link rel="stylesheet" href="/css/game.css" />
+	</head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Sketch</title>
-	<script src="https://unpkg.com/socket.io-client@3.0.1/dist/socket.io.min.js"></script>
-	<script>
-		socket = io.connect();
-	</script>
-	<script src="js/lib/p5.min.js"></script>
-	<script src="js/lib/addons/p5.dom.min.js"></script>
-	<script src="js/sketch.js"></script>
-	<script src="js/chat.js"></script>
-
-	<link rel="stylesheet" href="/css/game.css" />
-</head>
-
-<body>
-	<h1 id="header"></h1>
-	<div class="controls" id="left">
-
-	</div>
-	<div id="sketch-wrapper"></div>
-	<div id="chat-wrapper">
-		<div class="chatSender">
-			<input type="text" name="" id="sendField">
-			<button id="sendButton">send</button>
+	<body>
+		<h1 id="header"></h1>
+		<div id="game-wrapper">
+			<div id="sketch-wrapper"></div>
+			<div id="chat-wrapper">
+				<div class="chat" id="chat-box"></div>
+				<div class="chat-input">
+					<input type="text" name="" id="chatSendField" />
+					<button id="chatSendButton">send</button>
+				</div>
+			</div>
 		</div>
-		<div class="chat" id="chat"></div>
-	</div>
-</body>
-
+		<div id="misc-wrapper">
+			<div class="controls" id="userlist">
+				<p>Users in room:</p>
+				<p>xX_test_UsEr_Xx</p>
+				<p>xX_test_UsEr_2_Xx</p>
+			</div>
+		</div>
+	</body>
 </html>
