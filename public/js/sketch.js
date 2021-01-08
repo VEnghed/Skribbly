@@ -54,6 +54,14 @@ function updatePlayers(data) {
 	});
 }
 
+// Key listener
+function keyPressed() {
+	if (keyCode === ENTER) {
+		sendMessage(inputField.value);
+		inputField.value = "";
+	}
+}
+
 function sendMessage(msg) {
 	socket.emit("sendmsg", { msg: msg });
 	console.log("sending message: " + msg);
