@@ -1,6 +1,6 @@
 var prevX = -1;
 var prevY = -1;
-var chatSendField;
+var chatInputField;
 var chatSendButton;
 var chatBox;
 
@@ -10,8 +10,8 @@ function setup() {
 	background(0);
 	noStroke();
 
-	chatSendField = document.getElementById("chatSendField");
-	chatSendButton = document.getElementById("chatSendButton");
+	chatInputField = document.getElementById("chat-input-field");
+	chatSendButton = document.getElementById("chat-send-btn");
   chatBox = document.getElementById("chat-box");
 
   chatBox.addEventListener("DOMSubtreeModified", () => {
@@ -19,8 +19,8 @@ function setup() {
   });
   
 	chatSendButton.onclick = () => {
-		sendMessage(chatSendField.value);
-		chatSendField.value = "";
+		sendMessage(chatInputField.value);
+		chatInputField.value = "";
 	};
 
 	socket.on("stroke", (data) => {
@@ -63,8 +63,8 @@ function updatePlayers(data) {
 // Key listener
 function keyPressed() {
 	if (keyCode === ENTER) {
-		sendMessage(chatSendField.value);
-		chatSendField.value = "";
+		sendMessage(chatInputField.value);
+		chatInputField.value = "";
 	}
 }
 

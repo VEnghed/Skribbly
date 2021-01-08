@@ -1,13 +1,7 @@
 body {
-	/*display: inline;*/
-	/*flex-direction: row;*/
 }
 
 #userlist {
-	margin-right: 10px;
-	/*display: inline-block;*/
-	/*flex-direction: column;
-	justify-content: space-around;*/
 }
 
 #game-wrapper {
@@ -23,24 +17,24 @@ body {
 #chat-wrapper {
 	display: inline-block;
 	width: 30%;
-	background-color: beige;
+	
 }
 
 #chat-box {
 	max-height: 385px;
 	overflow: auto;
+	background-color: beige;
 }
 
-#chat-input {
+#chat-input-wrapper {
 	display: inline-block;
+	width: 100%;
 }
 
-#chatSendButton {
-	width: 20%;
+#chat-input-field {
+	width: 80%;
 }
 
-#chatSendField {
-	width: 76%;
+#chat-send-btn {
+	width: 17%;
 }
-
-
