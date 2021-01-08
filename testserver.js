@@ -40,56 +40,58 @@ app.post("/login", (req, res) => {
 
 let server = app.listen(1337, () => console.log("listening..."));
 
-var ws = io(server)
+var ws = io(server);
 
 //my own middleware to expose the request, lets us access session data in ws
 ws.use((socket, next) => {
-	sessionMiddleware(socket.request, {}, next)
+	sessionMiddleware(socket.request, {}, next);
 });
 
 ws.on("connection", (socket) => {
+	if (socket.request.session.name === "") {
+		console.log("EMPTY SESSION NAME FOUND");
+		return;
+	}
 
-	if (socket.request.session.name == '') return;
+	let name = socket.request.session.name;
+	let room = socket.request.session.room;
 
-	let name = socket.request.session.name
-	let room = socket.request.session.room
+	console.log(name + " connected");
 
-	console.log(name + ' connected')
-
-	socket.join(room)
+	socket.join(room);
 
 	if (!rooms[room]) {
-		console.log("Created room " + room)
-		rooms[room] = { players: {} }
+		console.log("Created room " + room);
+		rooms[room] = { players: {} };
 	}
-	rooms[room].players[name] = { points: 0 }
+	rooms[room].players[name] = { points: 0 };
 
-	console.log(rooms)
+	console.log(rooms);
 
 	socket.on("sketch", (data) => {
 		socket.to(room).emit("stroke", data);
-	})
+	});
 
 	socket.on("sendmsg", (msg) => {
-		ws.in(room).emit("recvmsg", {sender : name, msg : msg.msg});
+		ws.in(room).emit("recvmsg", { sender: name, msg: msg.msg });
 	});
 
 	// When a player disconnects.
 	socket.on("disconnect", () => {
-		console.log(name + ' has disconnected')
+		console.log(name + " has disconnected");
 		delete rooms[room].players[name];
 
-		ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+		ws.in(room).emit("newConnection", Object.keys(rooms[room].players));
 		// if no players are present in the room -> delete room
 		/* 		if (ObjectLength(rooms[room].players) === 0) {
 					console.log("Deleting " + rooms[room] + "...");
 					delete rooms[room];
 				} */
-		console.log('\t', rooms);
-	})
+		console.log("\t", rooms);
+	});
 
 	// When someone connects, we tell all in the room.
-	ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+	ws.in(room).emit("newConnection", Object.keys(rooms[room].players));
 
 	console.log(rooms);
 });
