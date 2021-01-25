@@ -1,27 +1,37 @@
 var prevX = -1;
 var prevY = -1;
+var body;
 var chatInputField;
 var chatSendButton;
 var chatBox;
+var drawLine = false;
 
 function setup() {
 	let canvas = createCanvas(600, 400);
 	canvas.parent("sketch-wrapper");
 	background(0);
+	let c = color(255, 255, 255);
+	fill(c);
 	noStroke();
 
+	body = document.getElementById("gamebody");
 	chatInputField = document.getElementById("chat-input-field");
 	chatSendButton = document.getElementById("chat-send-btn");
-  chatBox = document.getElementById("chat-box");
+	chatBox = document.getElementById("chat-box");
 
-  chatBox.addEventListener("DOMSubtreeModified", () => {
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
-  
+	chatBox.addEventListener("DOMSubtreeModified", () => {
+		chatBox.scrollTop = chatBox.scrollHeight;
+	});
+
 	chatSendButton.onclick = () => {
 		sendMessage(chatInputField.value);
 		chatInputField.value = "";
 	};
+
+	body.addEventListener("mouseup", () => {
+		console.log("mouseup");
+		drawLine = false;
+	});
 
 	socket.on("stroke", (data) => {
 		ellipse(data.x, data.y, 15, 15);
@@ -39,13 +49,23 @@ function draw() {
 	let x = Math.floor(mouseX);
 	let y = Math.floor(mouseY);
 
-	if (mouseIsPressed && x >= 0 && y >= 0 && x <= 600 && y <= 400)
+	if (mouseIsPressed && x >= 0 && y >= 0 && x <= 600 && y <= 400) {
 		if (prevX != x || prevY != y) {
+			stroke(255); // White
+			strokeWeight(10); // Line width
+
+			if (drawLine) {
+				line(prevX, prevY, x, y);
+			}
+			drawLine = true;
+
 			prevX = x;
 			prevY = y;
-			ellipse(x, y, 15, 15);
+			line(x, y, x, y); // Ellipse does not support being "filled", line is by default filled
 			sendStroke(x, y);
+			console.log("draw done");
 		}
+	}
 }
 
 function sendStroke(x, y) {
@@ -72,4 +92,3 @@ function sendMessage(msg) {
 	socket.emit("sendmsg", { msg: msg });
 	console.log("sending message: " + msg);
 }
-
