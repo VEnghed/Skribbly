@@ -34,7 +34,11 @@ function setup() {
 	});
 
 	socket.on("stroke", (data) => {
-		ellipse(data.x, data.y, 15, 15);
+		console.log(data);
+		if (data.drawLine) {
+			line(data.lineStartX, data.lineStartY, data.x, data.y);
+		}
+		line(data.x, data.y, data.x, data.y);
 	});
 
 	socket.on("newConnection", updatePlayers);
@@ -57,19 +61,25 @@ function draw() {
 			if (drawLine) {
 				line(prevX, prevY, x, y);
 			}
-			drawLine = true;
+
+			line(x, y, x, y); // Ellipse does not support being "filled", line is by default filled
+			sendStroke(x, y, drawLine, prevX, prevY);
 
 			prevX = x;
 			prevY = y;
-			line(x, y, x, y); // Ellipse does not support being "filled", line is by default filled
-			sendStroke(x, y);
-			console.log("draw done");
+			drawLine = true;
 		}
 	}
 }
 
 function sendStroke(x, y) {
-	socket.emit("sketch", { x: x, y: y });
+	socket.emit("sketch", {
+		x: x,
+		y: y,
+		drawLine: drawLine,
+		lineStartX: prevX,
+		lineStartY: prevY,
+	});
 }
 
 function updatePlayers(data) {
