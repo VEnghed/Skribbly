@@ -14,8 +14,13 @@ body {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+	max-width: 400px;
 	background-color: beige;
 
+}
+
+#filewrapper {
+	background-color: chartreuse;
 }
 
 .chatSender {

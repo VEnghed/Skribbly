@@ -5,6 +5,7 @@ const session = require("express-session");
 const io = require("socket.io");
 const https = require('https')
 const fs = require('fs')
+const siofu = require('socketio-file-upload')
 
 //dropping sessionstore as it interferes with websockets.
 
@@ -21,6 +22,7 @@ const sessionMiddleware = session({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(sessionMiddleware);
+app.use(siofu.router)
 
 app.use(express.static("public"));
 
@@ -61,6 +63,14 @@ ws.on("connection", (socket) => {
 	let name = socket.request.session.name;
 	let room = socket.request.session.room;
 
+	var upldr = new siofu();
+	upldr.dir = './public/uploads';
+	upldr.listen(socket);
+	upldr.on('complete', e => {
+		let str = e.file.pathName.split('\\').join('/').substring(7)
+		ws.in(room).emit('fileUploaded', { sender: name, path: str })
+	})
+
 	console.log(name + " connected");
 
 	socket.join(room);
@@ -95,14 +105,11 @@ ws.on("connection", (socket) => {
 		ws.in(room).emit('clear')
 	})
 
-	// When someone connects, we tell all in the room.
+	// When someone connects, we tell all in the 	room.
 	setTimeout(() => {
 		socket.emit('getChatHistory', rooms[room].messages)
 		ws.in(room).emit('newConnection', { players: Object.keys(rooms[room].players), drawing: rooms[room].drawing });
 	}, 50);
-
-
-
 });
 
 function ObjectLength(object) {

@@ -3,6 +3,7 @@ var prevY = -1
 let inputField
 let chatButton
 let chatWindow
+let fileField
 
 
 function setup() {
@@ -11,6 +12,7 @@ function setup() {
 	background(0)
 	noStroke()
 
+	fileField = document.getElementById('filewrapper')
 	inputField = document.getElementById('sendField')
 	chatButton = document.getElementById('sendButton')
 	chatWindow = document.getElementById('chat')
@@ -24,11 +26,18 @@ function setup() {
 		socket.emit('clear')
 	}
 
+	var upldr = new SocketIOFileUpload(socket);
+	upldr.listenOnInput(document.getElementById("fileUpload"));
+
 	socket.on('stroke', data => {
 		ellipse(data.x, data.y, 15, 15)
 	})
 
 	socket.on('newConnection', updatePlayers)
+
+	socket.on('fileUploaded', data => {
+		fileField.innerHTML += `<a href="${data.path}" target="_blank">File from ${data.sender}</a>`
+	})
 
 	socket.on("recvmsg", (msg) => {
 		console.log(msg.sender + ": " + msg.msg);
