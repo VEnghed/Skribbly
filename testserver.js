@@ -53,18 +53,17 @@ var ws = io(server)
 
 //my own middleware to expose the request, lets us access session data in ws
 ws.use((socket, next) => {
-	sessionMiddleware(socket.request, {}, next)
+	sessionMiddleware(socket.request, {}, next);
 });
 
 ws.on("connection", (socket) => {
 	if (socket.request.session.name == '') return;
+	let name = socket.request.session.name;
+	let room = socket.request.session.room;
 
-	let name = socket.request.session.name
-	let room = socket.request.session.room
+	console.log(name + " connected");
 
-	console.log(name + ' connected')
-
-	socket.join(room)
+	socket.join(room);
 
 	if (!rooms[room]) {
 		console.log("Created room " + room)
@@ -79,15 +78,15 @@ ws.on("connection", (socket) => {
 	// Player sends message, broadcast to room.
 	socket.on("sendmsg", (msg) => {
 		ws.in(room).emit("recvmsg", { sender: name, msg: msg.msg });
-
+		rooms[room].messages.push({ sender: name, msg: msg.msg })
 	});
 
 	// When a player disconnects.
 	socket.on("disconnect", () => {
-		console.log(name + ' has disconnected')
+		console.log(name + " has disconnected");
 		delete rooms[room].players[name];
 
-		ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+		ws.in(room).emit('newConnection', { players: Object.keys(rooms[room].players), drawing: rooms[room].drawing });
 	})
 
 	// A player clears the canvas.
@@ -98,6 +97,7 @@ ws.on("connection", (socket) => {
 
 	// When someone connects, we tell all in the room.
 	setTimeout(() => {
+		socket.emit('getChatHistory', rooms[room].messages)
 		ws.in(room).emit('newConnection', { players: Object.keys(rooms[room].players), drawing: rooms[room].drawing });
 	}, 50);
 
