@@ -13,9 +13,14 @@ function setup() {
   inputField = document.getElementById('sendField')
   chatButton = document.getElementById('sendButton')
   chatWindow = document.getElementById('chat')
+  clearButton = document.getElementById('clearButton')
   chatButton.onclick = () => {
     sendMessage(inputField.value);
     inputField.value = ''
+  }
+
+  clearButton.onclick = () => {
+    socket.emit('clear')
   }
 
   socket.on('stroke', data => {
@@ -27,7 +32,11 @@ function setup() {
   socket.on("recvmsg", (msg) => {
     console.log(msg.sender + ": " + msg.msg);
     chatWindow.innerHTML += "<p>" + msg.sender + ": " + msg.msg + "</p>"
-	});
+  });
+
+  socket.on('clear', () => {
+    background(0);
+  })
 }
 
 function draw() {
@@ -50,9 +59,10 @@ function sendStroke(x, y) {
 function updatePlayers(data) {
   let leftColumn = document.getElementById("left")
   leftColumn.innerHTML = "Online:";
-  data.forEach(element => {
+  data.players.forEach(element => {
     leftColumn.innerHTML += "<p>" + element + "</p>"
   });
+  data.drawing.forEach(point => ellipse(point.x, point.y, 15, 15))
 }
 
 function sendMessage(msg) {

@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const io = require("socket.io");
+const https = require('https')
+const fs = require('fs')
 
 //dropping sessionstore as it interferes with websockets.
 
@@ -38,9 +40,16 @@ app.post("/login", (req, res) => {
 	res.redirect("/game");
 });
 
-let server = app.listen(1337, () => console.log("listening..."));
+const secureServer = https.createServer({
+	key: fs.readFileSync('./ssl/server.key'),
+	cert: fs.readFileSync('./ssl/server.cert')
+}, app)
 
+
+
+server = secureServer.listen(1337, () => console.log("listening on 1337"))
 var ws = io(server)
+
 
 //my own middleware to expose the request, lets us access session data in ws
 ws.use((socket, next) => {
@@ -48,7 +57,6 @@ ws.use((socket, next) => {
 });
 
 ws.on("connection", (socket) => {
-
 	if (socket.request.session.name == '') return;
 
 	let name = socket.request.session.name
@@ -60,18 +68,18 @@ ws.on("connection", (socket) => {
 
 	if (!rooms[room]) {
 		console.log("Created room " + room)
-		rooms[room] = { players: {} }
+		rooms[room] = { players: {}, drawing: [], messages: [] }
 	}
 	rooms[room].players[name] = { points: 0 }
-
-	console.log(rooms)
-
 	socket.on("sketch", (data) => {
 		socket.to(room).emit("stroke", data);
+		rooms[room].drawing.push({ x: data.x, y: data.y });
 	})
 
+	// Player sends message, broadcast to room.
 	socket.on("sendmsg", (msg) => {
-		ws.in(room).emit("recvmsg", {sender : name, msg : msg.msg});
+		ws.in(room).emit("recvmsg", { sender: name, msg: msg.msg });
+
 	});
 
 	// When a player disconnects.
@@ -80,18 +88,21 @@ ws.on("connection", (socket) => {
 		delete rooms[room].players[name];
 
 		ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
-		// if no players are present in the room -> delete room
-		/* 		if (ObjectLength(rooms[room].players) === 0) {
-					console.log("Deleting " + rooms[room] + "...");
-					delete rooms[room];
-				} */
-		console.log('\t', rooms);
+	})
+
+	// A player clears the canvas.
+	socket.on('clear', () => {
+		rooms[room].drawing = []
+		ws.in(room).emit('clear')
 	})
 
 	// When someone connects, we tell all in the room.
-	ws.in(room).emit('newConnection', Object.keys(rooms[room].players));
+	setTimeout(() => {
+		ws.in(room).emit('newConnection', { players: Object.keys(rooms[room].players), drawing: rooms[room].drawing });
+	}, 50);
 
-	console.log(rooms);
+
+
 });
 
 function ObjectLength(object) {
